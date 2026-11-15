@@ -49,15 +49,11 @@
   ],
 
   "//": "--- CUSTOM POWER GRID FOR SRAM (Overrides Default) ---",
-  "PDN_MULTILAYER": 0,
-  "PDN_VWIDTH": 2.1,
-  "PDN_VSPACING": 3.52,
-  "PDN_VPITCH": 11.24,
-  "PDN_VOFFSET": 6.15,
-  "PDN_MACRO_CONNECTIONS": [
-    "i_sram VPWR VGND VDD! VSS!",
-    "i_sram VPWR VGND VDDARRAY! VSS!"
-  ],
+  "FP_PDN_MULTILAYER": 0,
+  "FP_PDN_VWIDTH": 2.1,
+  "FP_PDN_VSPACING": 3.52,
+  "FP_PDN_VPITCH": 11.24,
+  "FP_PDN_VOFFSET": 6.15,
 
   "//": "--- SRAM DRC WAIVERS (Overrides Default) ---",
   "RUN_MAGIC_DRC": 0,
