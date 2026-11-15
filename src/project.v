@@ -1,64 +1,53 @@
-module tt_um_my_first_chip (
-    input  wire [7:0] ui_in,    // Dedicated inputs
-    output wire [7:0] uo_out,   // Dedicated outputs
-    input  wire [7:0] uio_in,   // IOs: Input path
-    output wire [7:0] uio_out,  // IOs: Output path
-    output wire [7:0] uio_oe,   // IOs: Enable path (active high: 0=input, 1=output)
-    input  wire       ena,      // always 1 when the design is powered
-    input  wire       clk,      // clock
-    input  wire       rst_n     // reset_n - low to reset
+`ifndef SIM
+// Synthesis tools need to know the ports exist, but shouldn't look inside.
+(* blackbox *)
+module RM_IHPSG13_1P_1024x32_c2_bm_bist (
+    input A_CLK, input A_MEN, input A_WEN, input A_REN,
+    input [9:0] A_ADDR, input [31:0] A_DIN, input A_DLY,
+    output [31:0] A_DOUT, input [31:0] A_BM,
+    input A_BIST_CLK, input A_BIST_EN, input A_BIST_MEN,
+    input A_BIST_WEN, input A_BIST_REN, input [9:0] A_BIST_ADDR,
+    input [31:0] A_BIST_DIN, input [31:0] A_BIST_BM
 );
+endmodule
+`endif
 
-    // Tie off the bidirectional IOs since we aren't using them
+module tt_um_my_first_chip (
+    input  wire [7:0] ui_in,
+    output wire [7:0] uo_out,
+    input  wire [7:0] uio_in,
+    output wire [7:0] uio_out,
+    output wire [7:0] uio_oe,
+    input  wire       ena,
+    input  wire       clk,
+    input  wire       rst_n
+);
     assign uio_out = 8'b0;
     assign uio_oe  = 8'b0;
 
-    // Registers to hold our current count and clock division
-    reg [25:0] clk_div;
-    reg [3:0]  counter;
+    wire [31:0] sram_dout;
 
-    // 1. The Clock Divider and Counter
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            // When reset is pressed, clear everything to 0
-            clk_div <= 0;
-            counter <= 0;
-        end else begin
-            // 50,000,000 clock cycles = 1 second at 50MHz
-            if (clk_div == 50_000_000 - 1) begin
-                clk_div <= 0;
-                
-                // Count from 0 to 9, then loop back
-                if (counter == 9)
-                    counter <= 0;
-                else
-                    counter <= counter + 1;
-            end else begin
-                clk_div <= clk_div + 1;
-            end
-        end
-    end
+    // Instantiate the 4KB IHP SRAM Macro
+    RM_IHPSG13_1P_1024x32_c2_bm_bist i_sram (
+        .A_CLK       (clk),
+        .A_MEN       (ena),          // enable when chip is selected
+        .A_WEN       (ui_in[0]),     // use pin 0 for write enable
+        .A_REN       (!ui_in[0]),    // read when not writing
+        .A_ADDR      ({2'b00, ui_in[7:0]}), // padded to 10 bits
+        .A_DIN       ({24'b0, ui_in}),      // write inputs to memory
+        .A_DLY       (1'b1),         
+        .A_DOUT      (sram_dout),
+        .A_BM        (32'hFFFFFFFF), // Write all bits
+        .A_BIST_CLK  (1'b0),
+        .A_BIST_EN   (1'b0),         
+        .A_BIST_MEN  (1'b0),
+        .A_BIST_WEN  (1'b0),
+        .A_BIST_REN  (1'b0),
+        .A_BIST_ADDR (10'h0),        // padded to 10 bits
+        .A_BIST_DIN  (32'h0),
+        .A_BIST_BM   (32'h0)
+    );
 
-    // 2. The 7-Segment Decoder
-    // Maps the 4-bit counter to the 8 output pins (dot, g, f, e, d, c, b, a)
-    reg [7:0] seg_out;
-    always @(*) begin
-        case (counter)
-            4'd0: seg_out = 8'b0011_1111;
-            4'd1: seg_out = 8'b0000_0110;
-            4'd2: seg_out = 8'b0101_1011;
-            4'd3: seg_out = 8'b0100_1111;
-            4'd4: seg_out = 8'b0110_0110;
-            4'd5: seg_out = 8'b0110_1101;
-            4'd6: seg_out = 8'b0111_1101;
-            4'd7: seg_out = 8'b0000_0111;
-            4'd8: seg_out = 8'b0111_1111;
-            4'd9: seg_out = 8'b0110_1111;
-            default: seg_out = 8'b0000_0000;
-        endcase
-    end
-
-    // Send the decoded signals to the actual output pins
-    assign uo_out = seg_out;
-
+    // Send the lowest 8 bits of SRAM data to the output pins
+    assign uo_out = sram_dout[7:0];
 endmodule
