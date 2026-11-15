@@ -45,16 +45,15 @@
   "FP_MACRO_HORIZONTAL_HALO": 2,
   "ROUTING_OBSTRUCTIONS": [
     "Metal2 3.36 3.78 420.0 380.0",
-    "Metal3 3.36 3.78 420.0 380.0",
-    "Metal4 3.36 3.78 420.0 380.0"
+    "Metal3 3.36 3.78 420.0 380.0"
   ],
 
   "//": "--- CUSTOM POWER GRID FOR SRAM (Overrides Default) ---",
   "FP_PDN_MULTILAYER": 0,
   "FP_PDN_VWIDTH": 2.1,
   "FP_PDN_VSPACING": 3.52,
-  "FP_PDN_VPITCH": 44.96,
-  "FP_PDN_VOFFSET": 7.975,
+  "FP_PDN_VPITCH": 11.24,
+  "FP_PDN_VOFFSET": 6.15,
   "PDN_MACRO_CONNECTIONS": [
     "i_sram VPWR VGND VDD! VSS!",
     "i_sram VPWR VGND VDDARRAY! VSS!"
