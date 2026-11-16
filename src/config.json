@@ -56,8 +56,8 @@
   "FP_PDN_VPITCH": 11.24,
   "FP_PDN_VOFFSET": 7.975,
   "PDN_MACRO_CONNECTIONS": [
-    "i_sram VPWR VGND VDD! VSS!",
-    "i_sram VPWR VGND VDDARRAY! VSS!"
+    "i_sram vccd1 vssd1 VDD! VSS!",
+    "i_sram vccd1 vssd1 VDDARRAY! VSS!"
   ],
 
   "//": "--- SRAM DRC WAIVERS (Overrides Default) ---",
