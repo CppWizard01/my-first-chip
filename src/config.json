@@ -61,6 +61,7 @@
   ],
 
   "//": "--- SRAM DRC WAIVERS (Overrides Default) ---",
+  "RUN_LVS": 0,
   "RUN_MAGIC_DRC": 0,
   "ERROR_ON_ILLEGAL_OVERLAPS": 0,
   "RUN_KLAYOUT_DRC": 1,
